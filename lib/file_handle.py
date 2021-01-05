@@ -1,5 +1,6 @@
 import os, shutil
 import logging
+from folder_info import info
 '''
 Move files to folders depend on their name
 
@@ -12,10 +13,9 @@ If file already exist, rename by number '1,2,...'
 '''
 logging.basicConfig(level=logging.DEBUG, format=' %(asctime)s - %(levelname)s - %(message)s')
 
-class_folder = ['TCSS371', 'TCSS342']
-
-destination_folder = r'/Users/alextrinh/Library/Mobile Documents/com~apple~CloudDocs/School'
-source_folder = r'/Users/alextrinh/Downloads'
+class_folder = info.get('class_names')
+destination_folder = info.get('destination_folder')
+source_folder = info.get('source_folder')
 
 def folder_is_existed(path):
     return os.path.exists(path)
@@ -44,8 +44,13 @@ def get_file_name(path):
     return file_name
 
 def move_file(source_path, destination_path):
+    '''
+    @type source_path: str
+    @type destination_path: str
+    @pram source_path: path of the folder containing files will be moved
+    @pram destination_path: path of the folder that files will be stored
+    '''
     filename = get_file_name(source_path)
-
     des_path = destination_path
     if folder_is_existed(des_path):
         pass
@@ -65,16 +70,14 @@ def move_file(source_path, destination_path):
     file_path = destination_path + '/' + file_name_str
     shutil.move(source_path, file_path)
 
+#start moving file
 for file in os.listdir(source_folder):
-    if file.startswith('TCSS342'):        
-        file_path = os.path.join(source_folder, file)
-        destination = destination_folder + r'/TCSS 342'
-        move_file(file_path,destination)
-    elif file.startswith('TCSS371'): 
-        file_path = os.path.join(source_folder, file)
-        destination = destination_folder + r'/TCSS 371'
-        move_file(file_path,destination)
-    elif file.startswith('TCSS390'): 
-        file_path = os.path.join(source_folder, file)
-        destination = destination_folder + r'/TCSS 390'
-        move_file(file_path,destination)
+    file_path = os.path.join(source_folder, file)
+    folder_name = ''
+
+    for class_name in class_folder:
+        if file.lower().startswith(class_name.lower()):
+            folder_name = '{}{}'.format('/', class_name)
+            logging.debug(folder_name)
+            destination = destination_folder + folder_name
+            move_file(file_path,destination)
